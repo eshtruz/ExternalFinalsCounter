@@ -9,5 +9,9 @@
 
 // add headers that you want to pre-compile here
 #include "framework.h"
+#include <jni.h>
+#include <jvmti.h>
+
+#include "Utils.h"
 
 #endif //PCH_H
