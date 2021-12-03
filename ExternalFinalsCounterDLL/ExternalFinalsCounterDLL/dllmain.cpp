@@ -13,7 +13,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        if (!CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE) inject, nullptr, 0, nullptr))
+        if (!CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(inject), nullptr, 0, nullptr))
         {
             Utils::messageBox("Failed to create thread");
             return FALSE;

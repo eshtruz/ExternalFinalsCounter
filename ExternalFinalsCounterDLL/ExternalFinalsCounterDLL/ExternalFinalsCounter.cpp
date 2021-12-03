@@ -27,7 +27,7 @@ bool ExternalFinalsCounter::attach()
 		return false;
 	}
 
-	GetCreatedJavaVMs jni_GetCreatedJavaVMs = (GetCreatedJavaVMs) jni_GetCreatedJavaVMsProcAddress;
+	GetCreatedJavaVMs jni_GetCreatedJavaVMs = reinterpret_cast<GetCreatedJavaVMs>(jni_GetCreatedJavaVMsProcAddress);
 
 	jsize count;
 	if (jni_GetCreatedJavaVMs(&vm, 1, &count) != JNI_OK)

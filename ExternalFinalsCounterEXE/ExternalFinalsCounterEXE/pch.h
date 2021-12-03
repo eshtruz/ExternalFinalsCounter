@@ -8,5 +8,8 @@
 #define PCH_H
 
 // add headers that you want to pre-compile here
+#include <windows.h>
+#include <iostream>
+#include <string.h>
 
 #endif //PCH_H
