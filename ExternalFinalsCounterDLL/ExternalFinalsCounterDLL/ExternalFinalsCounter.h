@@ -5,9 +5,9 @@
 class ExternalFinalsCounter
 {
 public:
-	ExternalFinalsCounter();
+	ExternalFinalsCounter(HMODULE hModule);
 private:
-	typedef jint(JNICALL* GetCreatedJavaVMs)(JavaVM**, jsize, jsize*);
+	typedef jint(JNICALL *GetCreatedJavaVMs)(JavaVM**, jsize, jsize*);
 
 	JavaVM* vm = nullptr;
 	JNIEnv* jni = nullptr;

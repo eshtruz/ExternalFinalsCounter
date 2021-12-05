@@ -1,10 +1,11 @@
 #include "pch.h"
 #include "ExternalFinalsCounter.h"
 
-ExternalFinalsCounter::ExternalFinalsCounter()
+ExternalFinalsCounter::ExternalFinalsCounter(HMODULE hModule)
 {
 	if (!attach())
 	{
+		FreeLibraryAndExitThread(hModule, 0);
 		return;
 	}
 
@@ -32,7 +33,7 @@ bool ExternalFinalsCounter::attach()
 	jsize count;
 	if (jni_GetCreatedJavaVMs(&vm, 1, &count) != JNI_OK)
 	{
-		Utils::messageBox("Failed to get the JVM");
+		Utils::messageBox("Failed to get created JVMs");
 		return false;
 	}
 
@@ -42,23 +43,16 @@ bool ExternalFinalsCounter::attach()
 		return false;
 	}
 
-	jint result = vm->GetEnv(reinterpret_cast<void**>(&jni), JNI_VERSION_1_8);
-
-	if (result == JNI_EDETACHED)
-	{
-		result = vm->AttachCurrentThread(reinterpret_cast<void**>(&jni), nullptr);
-	}
-
-	if (result != JNI_OK)
+	if (vm->AttachCurrentThread(reinterpret_cast<void**>(&jni), nullptr) != JNI_OK)
 	{
 		Utils::messageBox("Failed to attach current thread to the JVM");
 		return false;
 	}
 
-	result = vm->GetEnv(reinterpret_cast<void**>(&jvmti), JVMTI_VERSION);
-	if (result != JNI_OK)
+	if (vm->GetEnv(reinterpret_cast<void**>(&jvmti), JVMTI_VERSION) != JNI_OK)
 	{
 		Utils::messageBox("Failed to get JVMTI");
+		vm->DetachCurrentThread();
 		return false;
 	}
 

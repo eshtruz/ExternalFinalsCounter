@@ -1,9 +1,11 @@
 #include "pch.h"
 #include "ExternalFinalsCounter.h"
 
-void inject()
+DWORD WINAPI inject(LPVOID hModule)
 {
-    ExternalFinalsCounter();
+    ExternalFinalsCounter(reinterpret_cast<HMODULE>(hModule));
+
+    return 0;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule,
@@ -13,7 +15,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        if (!CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(inject), nullptr, 0, nullptr))
+        if (!CreateThread(nullptr, 0, inject, hModule, 0, nullptr))
         {
             Utils::messageBox("Failed to create thread");
             return FALSE;
