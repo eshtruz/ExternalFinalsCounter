@@ -8,6 +8,21 @@ DWORD WINAPI inject(LPVOID hModule)
     return 0;
 }
 
+bool createInjectThread(HMODULE hModule)
+{
+    HANDLE hThread = CreateThread(nullptr, 0, inject, hModule, 0, nullptr);
+
+    if (!hThread)
+    {
+        Utils::messageBox("Failed to create thread");
+        return false;
+    }
+
+    CloseHandle(hThread);
+
+    return true;
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved)
@@ -15,9 +30,8 @@ BOOL APIENTRY DllMain(HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        if (!CreateThread(nullptr, 0, inject, hModule, 0, nullptr))
+        if (!createInjectThread(hModule))
         {
-            Utils::messageBox("Failed to create thread");
             return FALSE;
         }
         break;
