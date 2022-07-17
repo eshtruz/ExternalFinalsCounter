@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClInclude Include="com_shtruz_externalfinalscounter_ExternalFinalsCounter.h" />
     <ClInclude Include="com_shtruz_externalfinalscounter_instrument_Instrumentation.h" />
+    <ClInclude Include="globals.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
