@@ -147,12 +147,26 @@ int main()
 	std::cout << "Attempting to inject" << std::endl;
 
 	const char* dll = "ExternalFinalsCounterDLL.dll";
-	// TODO: Add a check for jar
 	const char* jar = "ExternalFinalsCounterJAR.jar";
+	const char* jarDLL = "ExternalFinalsCounterJARDLL.dll";
 
 	if (GetFileAttributesA(dll) == INVALID_FILE_ATTRIBUTES)
 	{
 		std::cout << "ExternalFinalsCounterDLL.dll not found in the current folder" << std::endl;
+		system("pause");
+		return 0;
+	}
+
+	if (GetFileAttributesA(jar) == INVALID_FILE_ATTRIBUTES)
+	{
+		std::cout << "ExternalFinalsCounterJAR.jar not found in the current folder" << std::endl;
+		system("pause");
+		return 0;
+	}
+
+	if (GetFileAttributesA(jarDLL) == INVALID_FILE_ATTRIBUTES)
+	{
+		std::cout << "ExternalFinalsCounterJARDLL.dll not found in the current folder" << std::endl;
 		system("pause");
 		return 0;
 	}
