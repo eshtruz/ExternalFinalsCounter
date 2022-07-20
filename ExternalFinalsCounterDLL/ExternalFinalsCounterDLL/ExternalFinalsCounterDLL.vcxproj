@@ -142,7 +142,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\Program Files\Eclipse Adoptium\jdk-8.0.312.7-hotspot\include;C:\Program Files\Eclipse Adoptium\jdk-8.0.312.7-hotspot\include\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\Eclipse Adoptium\jdk-8.0.332.9-hotspot\include;C:\Program Files\Eclipse Adoptium\jdk-8.0.332.9-hotspot\include\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

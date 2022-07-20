@@ -9,7 +9,19 @@ ExternalFinalsCounter::ExternalFinalsCounter(HMODULE hModule)
 		return;
 	}
 
+	if (!load())
+	{
+		jvmti->DisposeEnvironment();
+		vm->DetachCurrentThread();
+		FreeLibraryAndExitThread(hModule, 0);
+		return;
+	}
+
 	Utils::messageBox("Injected!");
+
+	jvmti->DisposeEnvironment();
+	vm->DetachCurrentThread();
+	FreeLibraryAndExitThread(hModule, 0);
 }
 
 bool ExternalFinalsCounter::attach()
@@ -53,6 +65,74 @@ bool ExternalFinalsCounter::attach()
 	{
 		Utils::messageBox("Failed to get JVMTI");
 		vm->DetachCurrentThread();
+		return false;
+	}
+
+	return true;
+}
+
+bool ExternalFinalsCounter::load()
+{
+	jclass urlClassLoaderClass = jni->FindClass("java/net/URLClassLoader");
+	jmethodID addURLMethodID = jni->GetMethodID(urlClassLoaderClass, "addURL", "(Ljava/net/URL;)V");
+
+	jclass fileClass = jni->FindClass("java/io/File");
+	jmethodID fileConstructorMethodID = jni->GetMethodID(fileClass, "<init>", "(Ljava/lang/String;)V");
+	jmethodID toURIMethodID = jni->GetMethodID(fileClass, "toURI", "()Ljava/net/URI;");
+	
+	jclass uriClass = jni->FindClass("java/net/URI");
+	jmethodID toURLMethodID = jni->GetMethodID(uriClass, "toURL", "()Ljava/net/URL;");
+
+	jobject classLoader = Utils::getThreadGroupClassLoader(jni);
+
+	if (!jni->IsInstanceOf(classLoader, urlClassLoaderClass))
+	{
+		Utils::messageBox("Class Loader is not instanceof URLClassLoader");
+		return false;
+	}
+
+	jobject externalFinalsCounterJARFile = jni->NewObject(fileClass, fileConstructorMethodID, jni->NewStringUTF("ExternalFinalsCounterJAR.jar"));
+	jobject uri = jni->CallObjectMethod(externalFinalsCounterJARFile, toURIMethodID);
+	jobject url = jni->CallObjectMethod(uri, toURLMethodID);
+
+	if (jni->ExceptionCheck())
+	{
+		jni->ExceptionDescribe();
+		jni->ExceptionClear();
+		return false;
+	}
+
+	jni->CallVoidMethod(classLoader, addURLMethodID, url);
+
+	jclass classLoaderClass = jni->FindClass("java/lang/ClassLoader");
+	jmethodID findClassMethodID = jni->GetMethodID(classLoaderClass, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;");
+
+	jclass externalFinalsCounterClass = reinterpret_cast<jclass>(jni->CallObjectMethod(classLoader, findClassMethodID, jni->NewStringUTF("com.shtruz.externalfinalscounter.ExternalFinalsCounter")));
+	jmethodID externalFinalsCounterConstructorMethodID = jni->GetMethodID(externalFinalsCounterClass, "<init>", "()V");
+	jmethodID externalFinalsCounterInitializeMethodID = jni->GetMethodID(externalFinalsCounterClass, "initialize", "(Lcom/shtruz/externalfinalscounter/Client;Ljava/lang/ClassLoader;)Z");
+
+	jclass clientClass = reinterpret_cast<jclass>(jni->CallObjectMethod(classLoader, findClassMethodID, jni->NewStringUTF("com.shtruz.externalfinalscounter.Client")));
+	jfieldID vanillaFieldID = jni->GetStaticFieldID(clientClass, "VANILLA", "Lcom/shtruz/externalfinalscounter/Client;");
+	jfieldID lunarFieldID = jni->GetStaticFieldID(clientClass, "LUNAR", "Lcom/shtruz/externalfinalscounter/Client;");
+
+	jobject client = nullptr;
+
+	HWND hWnd = GetActiveWindow();
+	const int length = GetWindowTextLengthA(hWnd);
+	char* windowTitle = new char[length + 1];
+	GetWindowTextA(hWnd, windowTitle, length + 1);
+
+	if (strstr(windowTitle, "Minecraft 1.8.9"))
+	{
+		client = jni->GetStaticObjectField(clientClass, vanillaFieldID);
+	}
+
+	delete[] windowTitle;
+
+	jobject externalFinalsCounter = jni->NewObject(externalFinalsCounterClass, externalFinalsCounterConstructorMethodID);
+
+	if (!jni->CallBooleanMethod(externalFinalsCounter, externalFinalsCounterInitializeMethodID, client, classLoader))
+	{
 		return false;
 	}
 
