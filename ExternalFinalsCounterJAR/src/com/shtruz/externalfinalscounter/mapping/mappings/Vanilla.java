@@ -52,7 +52,7 @@ public class Vanilla extends Mapping {
         names.get("nx").getRight().replace("a(Ljava/lang/String;)Ljava/lang/String;", "a");
 
         names.get("avh").setLeft("avh");
-        names.get("avh").getMiddle().replace("aB", "aB");
+        names.get("avh").getMiddle().replace("aC", "aC");
 
         names.get("bfl").setLeft("bfl");
         names.get("bfl").getRight().replace("E()V", "E");

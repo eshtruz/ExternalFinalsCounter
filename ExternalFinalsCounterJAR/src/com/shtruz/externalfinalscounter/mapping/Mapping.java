@@ -58,7 +58,7 @@ public abstract class Mapping {
         names.get("nx").getRight().put("a(Ljava/lang/String;)Ljava/lang/String;", null);
 
         names.put("avh", new MutableTriple<>(null, new HashMap<>(), new HashMap<>()));
-        names.get("avh").getMiddle().put("aB", null);
+        names.get("avh").getMiddle().put("aC", null);
 
         names.put("bfl", new MutableTriple<>(null, new HashMap<>(), new HashMap<>()));
         names.get("bfl").getRight().put("E()V", null);
@@ -142,7 +142,7 @@ public abstract class Mapping {
             stripControlCodesMethod = stringUtilsClass.getDeclaredMethod(names.get("nx").getRight().get("a(Ljava/lang/String;)Ljava/lang/String;"), String.class);
 
             gameSettingsClass = Class.forName(names.get("avh").getLeft());
-            showDebugInfoField = gameSettingsClass.getDeclaredField(names.get("avh").getMiddle().get("aB"));
+            showDebugInfoField = gameSettingsClass.getDeclaredField(names.get("avh").getMiddle().get("aC"));
 
             glStateManagerClass = Class.forName(names.get("bfl").getLeft());
             pushMatrixMethod = glStateManagerClass.getDeclaredMethod(names.get("bfl").getRight().get("E()V"));

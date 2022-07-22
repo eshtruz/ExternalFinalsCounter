@@ -9,7 +9,7 @@ ExternalFinalsCounter::ExternalFinalsCounter(HMODULE hModule)
 		return;
 	}
 
-	if (!load())
+	if (!load(hModule))
 	{
 		jvmti->DisposeEnvironment();
 		vm->DetachCurrentThread();
@@ -71,13 +71,13 @@ bool ExternalFinalsCounter::attach()
 	return true;
 }
 
-bool ExternalFinalsCounter::load()
+bool ExternalFinalsCounter::load(HMODULE hModule)
 {
 	jclass urlClassLoaderClass = jni->FindClass("java/net/URLClassLoader");
 	jmethodID addURLMethodID = jni->GetMethodID(urlClassLoaderClass, "addURL", "(Ljava/net/URL;)V");
 
 	jclass fileClass = jni->FindClass("java/io/File");
-	jmethodID fileConstructorMethodID = jni->GetMethodID(fileClass, "<init>", "(Ljava/lang/String;)V");
+	jmethodID fileConstructorMethodID = jni->GetMethodID(fileClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
 	jmethodID toURIMethodID = jni->GetMethodID(fileClass, "toURI", "()Ljava/net/URI;");
 	
 	jclass uriClass = jni->FindClass("java/net/URI");
@@ -91,7 +91,16 @@ bool ExternalFinalsCounter::load()
 		return false;
 	}
 
-	jobject externalFinalsCounterJARFile = jni->NewObject(fileClass, fileConstructorMethodID, jni->NewStringUTF("ExternalFinalsCounterJAR.jar"));
+	char path[MAX_PATH];
+
+	GetModuleFileNameA(hModule, path, MAX_PATH);
+
+	char* lastBackslash = strrchr(path, '\\');
+	*lastBackslash = '\0';
+
+	jstring jpath = jni->NewStringUTF(path);
+
+	jobject externalFinalsCounterJARFile = jni->NewObject(fileClass, fileConstructorMethodID, jpath, jni->NewStringUTF("ExternalFinalsCounterJAR.jar"));
 	jobject uri = jni->CallObjectMethod(externalFinalsCounterJARFile, toURIMethodID);
 	jobject url = jni->CallObjectMethod(uri, toURLMethodID);
 
@@ -105,33 +114,26 @@ bool ExternalFinalsCounter::load()
 	jni->CallVoidMethod(classLoader, addURLMethodID, url);
 
 	jclass classLoaderClass = jni->FindClass("java/lang/ClassLoader");
-	jmethodID findClassMethodID = jni->GetMethodID(classLoaderClass, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;");
+	jmethodID loadClassMethodID = jni->GetMethodID(classLoaderClass, "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;");
 
-	jclass externalFinalsCounterClass = reinterpret_cast<jclass>(jni->CallObjectMethod(classLoader, findClassMethodID, jni->NewStringUTF("com.shtruz.externalfinalscounter.ExternalFinalsCounter")));
+	jclass externalFinalsCounterClass = reinterpret_cast<jclass>(jni->CallObjectMethod(classLoader, loadClassMethodID, jni->NewStringUTF("com.shtruz.externalfinalscounter.ExternalFinalsCounter")));
 	jmethodID externalFinalsCounterConstructorMethodID = jni->GetMethodID(externalFinalsCounterClass, "<init>", "()V");
-	jmethodID externalFinalsCounterInitializeMethodID = jni->GetMethodID(externalFinalsCounterClass, "initialize", "(Lcom/shtruz/externalfinalscounter/Client;Ljava/lang/ClassLoader;)Z");
+	jmethodID externalFinalsCounterInitializeMethodID = jni->GetMethodID(externalFinalsCounterClass, "initialize", "(Lcom/shtruz/externalfinalscounter/Client;Ljava/lang/ClassLoader;Ljava/lang/String;)Z");
 
-	jclass clientClass = reinterpret_cast<jclass>(jni->CallObjectMethod(classLoader, findClassMethodID, jni->NewStringUTF("com.shtruz.externalfinalscounter.Client")));
+	jclass clientClass = reinterpret_cast<jclass>(jni->CallObjectMethod(classLoader, loadClassMethodID, jni->NewStringUTF("com.shtruz.externalfinalscounter.Client")));
 	jfieldID vanillaFieldID = jni->GetStaticFieldID(clientClass, "VANILLA", "Lcom/shtruz/externalfinalscounter/Client;");
 	jfieldID lunarFieldID = jni->GetStaticFieldID(clientClass, "LUNAR", "Lcom/shtruz/externalfinalscounter/Client;");
 
 	jobject client = nullptr;
 
-	HWND hWnd = GetActiveWindow();
-	const int length = GetWindowTextLengthA(hWnd);
-	char* windowTitle = new char[length + 1];
-	GetWindowTextA(hWnd, windowTitle, length + 1);
-
-	if (strstr(windowTitle, "Minecraft 1.8.9"))
+	if (jni->FindClass("ave"))
 	{
 		client = jni->GetStaticObjectField(clientClass, vanillaFieldID);
 	}
 
-	delete[] windowTitle;
-
 	jobject externalFinalsCounter = jni->NewObject(externalFinalsCounterClass, externalFinalsCounterConstructorMethodID);
 
-	if (!jni->CallBooleanMethod(externalFinalsCounter, externalFinalsCounterInitializeMethodID, client, classLoader))
+	if (!jni->CallBooleanMethod(externalFinalsCounter, externalFinalsCounterInitializeMethodID, client, classLoader, jpath))
 	{
 		return false;
 	}

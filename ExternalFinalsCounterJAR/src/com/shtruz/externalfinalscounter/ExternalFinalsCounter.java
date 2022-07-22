@@ -28,12 +28,16 @@ public class ExternalFinalsCounter {
     private final FinalsCounterRenderer finalsCounterRenderer = new FinalsCounterRenderer(this);
     private final CommandManager commandManager = new CommandManager(this);
     private final Instrumentation instrumentation = new Instrumentation();
-    private final File configFile = new File("ExternalFinalsCounter.json");
+    private File configFile;
     private Config config = new Config();
     private final Gson gson = new Gson();
 
     public ExternalFinalsCounter() {
         instance = this;
+    }
+
+    public boolean initialize(Client client, ClassLoader classLoader, String workingDirectory) {
+        configFile = new File(workingDirectory, "ExternalFinalsCounter.json");
 
         if (configFile.exists()) {
             try {
@@ -45,9 +49,7 @@ public class ExternalFinalsCounter {
         } else {
             saveConfig();
         }
-    }
 
-    public boolean initialize(Client client, ClassLoader classLoader) {
         Mapping mapping;
 
         switch (client) {
@@ -65,7 +67,7 @@ public class ExternalFinalsCounter {
         }
 
         try {
-            System.load(new File("ExternalFinalsCounterJARDLL.dll").getAbsolutePath());
+            System.load(new File(workingDirectory, "ExternalFinalsCounterJARDLL.dll").getAbsolutePath());
         } catch (SecurityException | UnsatisfiedLinkError | NullPointerException exception) {
             JOptionPane.showMessageDialog(null, "Failed to load JAR DLL");
             exception.printStackTrace();
@@ -96,7 +98,7 @@ public class ExternalFinalsCounter {
     public boolean onPacket(Object packet) {
         try {
             if (s02PacketChatClass.isInstance(packet)) {
-                if ((boolean) isChatMethod.invoke(packet)) {
+                if (!((boolean) isChatMethod.invoke(packet))) {
                     Object chatComponent = getChatComponentMethod.invoke(packet);
                     chatMessageParser.onChat(chatComponent);
                 }
@@ -150,7 +152,7 @@ public class ExternalFinalsCounter {
                     return;
                 }
             }
-            
+
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(configFile));
             bufferedWriter.write(gson.toJson(config));
             bufferedWriter.close();

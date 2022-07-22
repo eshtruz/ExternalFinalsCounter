@@ -63,16 +63,16 @@ Java_com_shtruz_externalfinalscounter_ExternalFinalsCounter_initialize(JNIEnv*, 
     }
 
     jclass classLoaderClass = jni->FindClass("java/lang/ClassLoader");
-    jmethodID findClassMethodID = jni->GetMethodID(classLoaderClass, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;");
+    jmethodID loadClassMethodID = jni->GetMethodID(classLoaderClass, "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;");
 
     listClass = reinterpret_cast<jclass>(jni->NewGlobalRef(jni->FindClass("java/util/List")));
     sizeMethodID = jni->GetMethodID(listClass, "size", "()I");
     getMethodID = jni->GetMethodID(listClass, "get", "(I)Ljava/lang/Object;");
 
-    transformerClass = reinterpret_cast<jclass>(jni->NewGlobalRef(jni->CallObjectMethod(classLoader, findClassMethodID, jni->NewStringUTF("com.shtruz.externalfinalscounter.instrument.transformer.Transformer"))));
+    transformerClass = reinterpret_cast<jclass>(jni->NewGlobalRef(jni->CallObjectMethod(classLoader, loadClassMethodID, jni->NewStringUTF("com.shtruz.externalfinalscounter.instrument.transformer.Transformer"))));
     transformMethodID = jni->GetMethodID(transformerClass, "transform", "(Ljava/lang/ClassLoader;Ljava/lang/String;Ljava/lang/Class;Ljava/security/ProtectionDomain;[B)[B");
 
-    jclass instrumentationClass = reinterpret_cast<jclass>(jni->CallObjectMethod(classLoader, findClassMethodID, jni->NewStringUTF("com.shtruz.externalfinalscounter.instrument.Instrumentation")));
+    jclass instrumentationClass = reinterpret_cast<jclass>(jni->CallObjectMethod(classLoader, loadClassMethodID, jni->NewStringUTF("com.shtruz.externalfinalscounter.instrument.Instrumentation")));
     jfieldID instrumentationInstanceFieldID = jni->GetStaticFieldID(instrumentationClass, "instance", "Lcom/shtruz/externalfinalscounter/instrument/Instrumentation;");
     jfieldID transformersFieldID = jni->GetFieldID(instrumentationClass, "transformers", "Ljava/util/List;");
 

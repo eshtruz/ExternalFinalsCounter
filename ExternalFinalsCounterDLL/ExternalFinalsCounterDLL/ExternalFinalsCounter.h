@@ -14,5 +14,5 @@ private:
 	jvmtiEnv* jvmti = nullptr;
 
 	bool attach();
-	bool load();
+	bool load(HMODULE hModule);
 };
