@@ -8,8 +8,6 @@ public class Mappings {
 
     public static Class<?> chatComponentTextClass;
 
-    public static Class<?> packetClass;
-
     public static Class<?> scoreObjectiveClass;
     public static Method getDisplayNameMethod;
 
@@ -64,8 +62,11 @@ public class Mappings {
     public static Class<?> entityPlayerClass;
     public static Method addChatComponentMessageMethod;
 
-    public static Class<?> networkManagerClass;
-    public static Method sendPacketMethod;
+    public static Class<?> guiNewChatClass;
+    public static Method printChatMessageMethod;
+
+    public static Class<?> entityPlayerSPClass;
+    public static Method sendChatMessageMethod;
 
     public static Class<?> entityRendererClass;
     public static Method updateCameraAndRenderMethod;
@@ -73,11 +74,4 @@ public class Mappings {
     public static Class<?> guiPlayerTabOverlayClass;
     public static Method renderPlayerlistMethod;
     public static Method gptoGetPlayerNameMethod;
-
-    public static Class<?> s02PacketChatClass;
-    public static Method getChatComponentMethod;
-    public static Method isChatMethod;
-
-    public static Class<?> c01PacketChatMessageClass;
-    public static Method getMessageMethod;
 }

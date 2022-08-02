@@ -130,6 +130,10 @@ bool ExternalFinalsCounter::load(HMODULE hModule)
 	{
 		client = jni->GetStaticObjectField(clientClass, vanillaFieldID);
 	}
+	else if (jni->FindClass("com/moonsworth/lunar/genesis/Genesis"))
+	{
+		client = jni->GetStaticObjectField(clientClass, lunarFieldID);
+	}
 
 	jobject externalFinalsCounter = jni->NewObject(externalFinalsCounterClass, externalFinalsCounterConstructorMethodID);
 

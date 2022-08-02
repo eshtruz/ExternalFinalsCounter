@@ -1,5 +1,7 @@
 package com.shtruz.externalfinalscounter.instrument.transformer.transformers;
 
+import com.shtruz.externalfinalscounter.ExternalFinalsCounter;
+import com.shtruz.externalfinalscounter.instrument.transformer.CustomClassWriter;
 import com.shtruz.externalfinalscounter.instrument.transformer.Transformer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -9,8 +11,7 @@ import java.security.ProtectionDomain;
 import java.util.List;
 
 import static com.shtruz.externalfinalscounter.mapping.Mappings.*;
-import static org.objectweb.asm.Opcodes.GETSTATIC;
-import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static org.objectweb.asm.Opcodes.*;
 
 public class MinecraftTransformer implements Transformer {
     @Override
@@ -25,10 +26,33 @@ public class MinecraftTransformer implements Transformer {
                         if (abstractInsnNode instanceof MethodInsnNode) {
                             MethodInsnNode methodInsnNode = (MethodInsnNode) abstractInsnNode;
 
-                            if (methodInsnNode.getOpcode() == INVOKEVIRTUAL
-                                    && methodInsnNode.owner.equals(entityRendererClass.getName().replace('.', '/'))
-                                    && methodInsnNode.name.equals(updateCameraAndRenderMethod.getName())
-                                    && methodInsnNode.desc.equals("(FJ)V")) {
+                            boolean opcodeCheck;
+                            boolean ownerCheck;
+                            boolean nameCheck;
+                            boolean descCheck;
+
+                            switch (ExternalFinalsCounter.instance.getClient()) {
+                                case LUNAR:
+                                    opcodeCheck = methodInsnNode.getOpcode() == INVOKEVIRTUAL || methodInsnNode.getOpcode() == INVOKESPECIAL;
+                                    ownerCheck = methodInsnNode.owner.equals(entityRendererClass.getName().replace('.', '/'))
+                                            || methodInsnNode.owner.equals(minecraftClass.getName().replace('.', '/'));
+                                    nameCheck = methodInsnNode.name.equals(updateCameraAndRenderMethod.getName())
+                                            || (methodInsnNode.name.startsWith("redirect$") && methodInsnNode.name.contains("impl$on" + updateCameraAndRenderMethod.getName().substring(0, 1).toUpperCase() + updateCameraAndRenderMethod.getName().substring(1)));
+                                    descCheck = methodInsnNode.desc.equals("(FJ)V")
+                                            || methodInsnNode.desc.equals("(L" + entityRendererClass.getName().replace('.', '/') + ";FJ)V");
+                                    break;
+
+                                default:
+                                    opcodeCheck = methodInsnNode.getOpcode() == INVOKEVIRTUAL;
+                                    ownerCheck = methodInsnNode.owner.equals(entityRendererClass.getName().replace('.', '/'));
+                                    nameCheck = methodInsnNode.name.equals(updateCameraAndRenderMethod.getName());
+                                    descCheck = methodInsnNode.desc.equals("(FJ)V");
+                            }
+
+                            if (opcodeCheck
+                                    && ownerCheck
+                                    && nameCheck
+                                    && descCheck) {
                                 method.instructions.insert(methodInsnNode, onRender());
 
                                 break;
@@ -39,7 +63,7 @@ public class MinecraftTransformer implements Transformer {
                     break;
                 }
             }
-            ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+            ClassWriter classWriter = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
             classNode.accept(classWriter);
             return classWriter.toByteArray();
         }

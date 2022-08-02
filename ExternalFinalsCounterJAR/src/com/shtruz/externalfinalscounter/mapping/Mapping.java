@@ -15,8 +15,6 @@ public abstract class Mapping {
 
         names.put("fa", new MutableTriple<>(null, null, null));
 
-        names.put("ff", new MutableTriple<>(null, null, null));
-
         names.put("auk", new MutableTriple<>(null, new HashMap<>(), new HashMap<>()));
         names.get("auk").getRight().put("d()Ljava/lang/String;", null);
 
@@ -71,8 +69,11 @@ public abstract class Mapping {
         names.put("wn", new MutableTriple<>(null, new HashMap<>(), new HashMap<>()));
         names.get("wn").getRight().put("b(Leu;)V", null);
 
-        names.put("ek", new MutableTriple<>(null, new HashMap<>(), new HashMap<>()));
-        names.get("ek").getRight().put("a(Lff;)V", null);
+        names.put("avt", new MutableTriple<>(null, new HashMap<>(), new HashMap<>()));
+        names.get("avt").getRight().put("a(Leu;)V", null);
+
+        names.put("bew", new MutableTriple<>(null, new HashMap<>(), new HashMap<>()));
+        names.get("bew").getRight().put("e(Ljava/lang/String;)V", null);
 
         names.put("bfk", new MutableTriple<>(null, new HashMap<>(), new HashMap<>()));
         names.get("bfk").getRight().put("a(FJ)V", null);
@@ -80,13 +81,6 @@ public abstract class Mapping {
         names.put("awh", new MutableTriple<>(null, new HashMap<>(), new HashMap<>()));
         names.get("awh").getRight().put("a(ILauo;Lauk;)V", null);
         names.get("awh").getRight().put("a(Lbdc;)Ljava/lang/String;", null);
-
-        names.put("fy", new MutableTriple<>(null, new HashMap<>(), new HashMap<>()));
-        names.get("fy").getRight().put("a()Leu;", null);
-        names.get("fy").getRight().put("b()Z", null);
-
-        names.put("ie", new MutableTriple<>(null, new HashMap<>(), new HashMap<>()));
-        names.get("ie").getRight().put("a()Ljava/lang/String;", null);
 
         setupNames();
     }
@@ -98,8 +92,6 @@ public abstract class Mapping {
             teamClass = Class.forName(names.get("auq").getLeft());
 
             chatComponentTextClass = Class.forName(names.get("fa").getLeft());
-
-            packetClass = Class.forName(names.get("ff").getLeft());
 
             scoreObjectiveClass = Class.forName(names.get("auk").getLeft());
             getDisplayNameMethod = scoreObjectiveClass.getDeclaredMethod(names.get("auk").getRight().get("d()Ljava/lang/String;"));
@@ -155,8 +147,11 @@ public abstract class Mapping {
             entityPlayerClass = Class.forName(names.get("wn").getLeft());
             addChatComponentMessageMethod = entityPlayerClass.getDeclaredMethod(names.get("wn").getRight().get("b(Leu;)V"), iChatComponentClass);
 
-            networkManagerClass = Class.forName(names.get("ek").getLeft());
-            sendPacketMethod = networkManagerClass.getDeclaredMethod(names.get("ek").getRight().get("a(Lff;)V"), packetClass);
+            guiNewChatClass = Class.forName(names.get("avt").getLeft());
+            printChatMessageMethod = guiNewChatClass.getDeclaredMethod(names.get("avt").getRight().get("a(Leu;)V"), iChatComponentClass);
+
+            entityPlayerSPClass = Class.forName(names.get("bew").getLeft());
+            sendChatMessageMethod = entityPlayerSPClass.getDeclaredMethod(names.get("bew").getRight().get("e(Ljava/lang/String;)V"), String.class);
 
             entityRendererClass = Class.forName(names.get("bfk").getLeft());
             updateCameraAndRenderMethod = entityRendererClass.getDeclaredMethod(names.get("bfk").getRight().get("a(FJ)V"), float.class, long.class);
@@ -164,13 +159,6 @@ public abstract class Mapping {
             guiPlayerTabOverlayClass = Class.forName(names.get("awh").getLeft());
             renderPlayerlistMethod = guiPlayerTabOverlayClass.getDeclaredMethod(names.get("awh").getRight().get("a(ILauo;Lauk;)V"), int.class, scoreboardClass, scoreObjectiveClass);
             gptoGetPlayerNameMethod = guiPlayerTabOverlayClass.getDeclaredMethod(names.get("awh").getRight().get("a(Lbdc;)Ljava/lang/String;"), networkPlayerInfoClass);
-
-            s02PacketChatClass = Class.forName(names.get("fy").getLeft());
-            getChatComponentMethod = s02PacketChatClass.getDeclaredMethod(names.get("fy").getRight().get("a()Leu;"));
-            isChatMethod = s02PacketChatClass.getDeclaredMethod(names.get("fy").getRight().get("b()Z"));
-
-            c01PacketChatMessageClass = Class.forName(names.get("ie").getLeft());
-            getMessageMethod = c01PacketChatMessageClass.getDeclaredMethod(names.get("ie").getRight().get("a()Ljava/lang/String;"));
         } catch (ClassNotFoundException | NoSuchFieldException | NoSuchMethodException exception) {
             exception.printStackTrace();
             return false;

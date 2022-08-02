@@ -19,7 +19,8 @@ BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lParam)
 		return TRUE;
 	}
 
-	if (strstr(windowTitle, "Minecraft 1.8.9"))
+	if (strstr(windowTitle, "Minecraft 1.8.9")
+		|| strstr(windowTitle, "Lunar Client (1.8.9"))
 	{
 		GetWindowThreadProcessId(hWnd, &pid);
 

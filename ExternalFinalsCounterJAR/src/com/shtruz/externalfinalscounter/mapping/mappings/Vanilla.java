@@ -9,8 +9,6 @@ public class Vanilla extends Mapping {
 
         names.get("fa").setLeft("fa");
 
-        names.get("ff").setLeft("ff");
-
         names.get("auk").setLeft("auk");
         names.get("auk").getRight().replace("d()Ljava/lang/String;", "d");
 
@@ -65,8 +63,11 @@ public class Vanilla extends Mapping {
         names.get("wn").setLeft("wn");
         names.get("wn").getRight().replace("b(Leu;)V", "b");
 
-        names.get("ek").setLeft("ek");
-        names.get("ek").getRight().replace("a(Lff;)V", "a");
+        names.get("avt").setLeft("avt");
+        names.get("avt").getRight().replace("a(Leu;)V", "a");
+
+        names.get("bew").setLeft("bew");
+        names.get("bew").getRight().replace("e(Ljava/lang/String;)V", "e");
 
         names.get("bfk").setLeft("bfk");
         names.get("bfk").getRight().replace("a(FJ)V", "a");
@@ -74,12 +75,5 @@ public class Vanilla extends Mapping {
         names.get("awh").setLeft("awh");
         names.get("awh").getRight().replace("a(ILauo;Lauk;)V", "a");
         names.get("awh").getRight().replace("a(Lbdc;)Ljava/lang/String;", "a");
-
-        names.get("fy").setLeft("fy");
-        names.get("fy").getRight().replace("a()Leu;", "a");
-        names.get("fy").getRight().replace("b()Z", "b");
-
-        names.get("ie").setLeft("ie");
-        names.get("ie").getRight().replace("a()Ljava/lang/String;", "a");
     }
 }

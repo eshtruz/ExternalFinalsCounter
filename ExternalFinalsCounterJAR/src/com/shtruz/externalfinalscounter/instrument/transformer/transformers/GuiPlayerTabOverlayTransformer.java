@@ -1,5 +1,7 @@
 package com.shtruz.externalfinalscounter.instrument.transformer.transformers;
 
+import com.shtruz.externalfinalscounter.ExternalFinalsCounter;
+import com.shtruz.externalfinalscounter.instrument.transformer.CustomClassWriter;
 import com.shtruz.externalfinalscounter.instrument.transformer.Transformer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -27,11 +29,33 @@ public class GuiPlayerTabOverlayTransformer implements Transformer {
                         if (abstractInsnNode instanceof MethodInsnNode) {
                             MethodInsnNode methodInsnNode = (MethodInsnNode) abstractInsnNode;
 
-                            if (methodInsnNode.getOpcode() == INVOKEVIRTUAL
+                            boolean opcodeCheck;
+                            boolean nameCheck;
+                            boolean descCheck;
+
+                            switch (ExternalFinalsCounter.instance.getClient()) {
+                                case LUNAR:
+                                    opcodeCheck = methodInsnNode.getOpcode() == INVOKEVIRTUAL || methodInsnNode.getOpcode() == INVOKESPECIAL;
+                                    nameCheck = methodInsnNode.name.equals(gptoGetPlayerNameMethod.getName())
+                                            || (methodInsnNode.name.startsWith("redirect$") && methodInsnNode.name.contains("impl$on" + gptoGetPlayerNameMethod.getName().substring(0, 1).toUpperCase() + gptoGetPlayerNameMethod.getName().substring(1)));
+                                    descCheck = methodInsnNode.desc.equals("(L" + networkPlayerInfoClass.getName().replace('.', '/')
+                                            + ";)Ljava/lang/String;")
+                                            || methodInsnNode.desc.equals("(L" + guiPlayerTabOverlayClass.getName().replace('.', '/')
+                                            + ";L" + networkPlayerInfoClass.getName().replace('.', '/')
+                                            + ";)Ljava/lang/String;");
+                                    break;
+
+                                default:
+                                    opcodeCheck = methodInsnNode.getOpcode() == INVOKEVIRTUAL;
+                                    nameCheck = methodInsnNode.name.equals(gptoGetPlayerNameMethod.getName());
+                                    descCheck = methodInsnNode.desc.equals("(L" + networkPlayerInfoClass.getName().replace('.', '/')
+                                            + ";)Ljava/lang/String;");
+                            }
+
+                            if (opcodeCheck
                                     && methodInsnNode.owner.equals(guiPlayerTabOverlayClass.getName().replace('.', '/'))
-                                    && methodInsnNode.name.equals(gptoGetPlayerNameMethod.getName())
-                                    && methodInsnNode.desc.equals("(L" + networkPlayerInfoClass.getName().replace('.', '/')
-                                    + ";)Ljava/lang/String;")) {
+                                    && nameCheck
+                                    && descCheck) {
                                 if (methodInsnNode.getPrevious() instanceof VarInsnNode) {
                                     VarInsnNode varInsnNode = (VarInsnNode) methodInsnNode.getPrevious();
 
@@ -46,7 +70,7 @@ public class GuiPlayerTabOverlayTransformer implements Transformer {
                     break;
                 }
             }
-            ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+            ClassWriter classWriter = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
             classNode.accept(classWriter);
             return classWriter.toByteArray();
         }

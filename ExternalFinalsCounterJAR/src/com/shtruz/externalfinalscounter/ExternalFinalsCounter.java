@@ -5,10 +5,12 @@ import com.shtruz.externalfinalscounter.command.CommandManager;
 import com.shtruz.externalfinalscounter.finalscounter.ChatMessageParser;
 import com.shtruz.externalfinalscounter.finalscounter.FinalsCounterRenderer;
 import com.shtruz.externalfinalscounter.instrument.Instrumentation;
+import com.shtruz.externalfinalscounter.instrument.transformer.transformers.EntityPlayerSPTransformer;
+import com.shtruz.externalfinalscounter.instrument.transformer.transformers.GuiNewChatTransformer;
 import com.shtruz.externalfinalscounter.instrument.transformer.transformers.GuiPlayerTabOverlayTransformer;
 import com.shtruz.externalfinalscounter.instrument.transformer.transformers.MinecraftTransformer;
-import com.shtruz.externalfinalscounter.instrument.transformer.transformers.NetworkManagerTransformer;
 import com.shtruz.externalfinalscounter.mapping.Mapping;
+import com.shtruz.externalfinalscounter.mapping.mappings.Lunar;
 import com.shtruz.externalfinalscounter.mapping.mappings.Vanilla;
 
 import javax.swing.*;
@@ -16,7 +18,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -28,6 +29,7 @@ public class ExternalFinalsCounter {
     private final FinalsCounterRenderer finalsCounterRenderer = new FinalsCounterRenderer(this);
     private final CommandManager commandManager = new CommandManager(this);
     private final Instrumentation instrumentation = new Instrumentation();
+    private Client client;
     private File configFile;
     private Config config = new Config();
     private final Gson gson = new Gson();
@@ -37,6 +39,8 @@ public class ExternalFinalsCounter {
     }
 
     public boolean initialize(Client client, ClassLoader classLoader, String workingDirectory) {
+        this.client = client;
+
         configFile = new File(workingDirectory, "ExternalFinalsCounter.json");
 
         if (configFile.exists()) {
@@ -55,6 +59,10 @@ public class ExternalFinalsCounter {
         switch (client) {
             case VANILLA:
                 mapping = new Vanilla();
+                break;
+
+            case LUNAR:
+                mapping = new Lunar();
                 break;
 
             default:
@@ -79,11 +87,13 @@ public class ExternalFinalsCounter {
             return false;
         }
 
-        instrumentation.addTransformer(new NetworkManagerTransformer());
+        instrumentation.addTransformer(new GuiNewChatTransformer());
+        instrumentation.addTransformer(new EntityPlayerSPTransformer());
         instrumentation.addTransformer(new MinecraftTransformer());
         instrumentation.addTransformer(new GuiPlayerTabOverlayTransformer());
 
-        if (!instrumentation.retransformClass(networkManagerClass)
+        if (!instrumentation.retransformClass(guiNewChatClass)
+                || !instrumentation.retransformClass(entityPlayerSPClass)
                 || !instrumentation.retransformClass(minecraftClass)
                 || !instrumentation.retransformClass(guiPlayerTabOverlayClass)) {
             JOptionPane.showMessageDialog(null, "Failed to retransform classes");
@@ -95,34 +105,19 @@ public class ExternalFinalsCounter {
 
     private native boolean initialize(ClassLoader classLoader);
 
-    public boolean onPacket(Object packet) {
-        try {
-            if (s02PacketChatClass.isInstance(packet)) {
-                if (!((boolean) isChatMethod.invoke(packet))) {
-                    Object chatComponent = getChatComponentMethod.invoke(packet);
-                    chatMessageParser.onChat(chatComponent);
-                }
+    public void onPrintChatMessage(Object chatComponent) {
+        chatMessageParser.onChat(chatComponent);
+    }
 
-                return false;
+    public boolean onSendChatMessage(String message) {
+        message = message.trim();
+
+        if (message.startsWith(".")) {
+            message = message.substring(1);
+
+            if (!message.isEmpty()) {
+                return commandManager.executeCommand(message);
             }
-
-            if (c01PacketChatMessageClass.isInstance(packet)) {
-                String message = (String) getMessageMethod.invoke(packet);
-
-                message = message.trim();
-
-                if (message.startsWith(".")) {
-                    message = message.substring(1);
-
-                    if (!message.isEmpty()) {
-                        return commandManager.executeCommand(message);
-                    }
-                }
-
-                return false;
-            }
-        } catch (InvocationTargetException | IllegalAccessException exception) {
-            exception.printStackTrace();
         }
 
         return false;
@@ -138,6 +133,10 @@ public class ExternalFinalsCounter {
 
     public FinalsCounterRenderer getFinalsCounterRenderer() {
         return finalsCounterRenderer;
+    }
+
+    public Client getClient() {
+        return client;
     }
 
     public Config getConfig() {
