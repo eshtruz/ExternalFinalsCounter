@@ -14,6 +14,12 @@ import static com.shtruz.externalfinalscounter.mapping.Mappings.*;
 import static org.objectweb.asm.Opcodes.*;
 
 public class MinecraftTransformer implements Transformer {
+    private final Client client;
+
+    public MinecraftTransformer(Client client) {
+        this.client = client;
+    }
+
     @Override
     public byte[] transform(ClassLoader loader, String name, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] bytes) {
         if (classBeingRedefined == minecraftClass) {
@@ -31,7 +37,7 @@ public class MinecraftTransformer implements Transformer {
                             boolean nameCheck;
                             boolean descCheck;
 
-                            switch (ExternalFinalsCounter.instance.getClient()) {
+                            switch (client) {
                                 case LUNAR:
                                     opcodeCheck = methodInsnNode.getOpcode() == INVOKEVIRTUAL || methodInsnNode.getOpcode() == INVOKESPECIAL;
                                     ownerCheck = methodInsnNode.owner.equals(entityRendererClass.getName().replace('.', '/'))

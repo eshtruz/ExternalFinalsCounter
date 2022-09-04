@@ -15,12 +15,13 @@ public class ResetFinalsCommand implements Command {
     public void execute(ExternalFinalsCounter externalFinalsCounter, String[] args) {
         externalFinalsCounter.getChatMessageParser().reset();
 
-        String output = "Finals have been reset";
-
         try {
-            externalFinalsCounter.addChatComponentText(output);
-        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException | InstantiationException e) {
-            e.printStackTrace();
+            externalFinalsCounter.addChatComponentText("Reset finals");
+        } catch (IllegalAccessException
+                 | InvocationTargetException
+                 | NoSuchMethodException
+                 | InstantiationException exception) {
+            exception.printStackTrace();
         }
     }
 }

@@ -54,15 +54,7 @@ public class PlayerFinalsCommand implements Command {
                 stringBuilder.replace(stringBuilder.lastIndexOf("\n"), stringBuilder.lastIndexOf("\n") + 1, "");
             }
 
-            Object minecraft = getMinecraftMethod.invoke(null);
-
-            Object thePlayer = thePlayerField.get(minecraft);
-
-            Object stringBuilderChatComponentText = chatComponentTextClass
-                    .getDeclaredConstructor(String.class)
-                    .newInstance(stringBuilder.toString());
-
-            addChatComponentMessageMethod.invoke(thePlayer, stringBuilderChatComponentText);
+            externalFinalsCounter.addChatComponentText(stringBuilder.toString());
         } catch (IllegalAccessException
                  | InvocationTargetException
                  | NoSuchMethodException

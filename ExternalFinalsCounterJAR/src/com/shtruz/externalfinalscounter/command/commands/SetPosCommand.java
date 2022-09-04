@@ -37,12 +37,15 @@ public class SetPosCommand implements Command {
 
         externalFinalsCounter.saveConfig();
 
-        String output = "Finals HUD position has been set to X: " + x + ", Y: " + y;
-
         try {
+            String output = "Set pos to X: " + x + ", Y: " + y;
+
             externalFinalsCounter.addChatComponentText(output);
-        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException | InstantiationException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException
+                 | InvocationTargetException
+                 | NoSuchMethodException
+                 | InstantiationException exception) {
+            exception.printStackTrace();
         }
     }
 }

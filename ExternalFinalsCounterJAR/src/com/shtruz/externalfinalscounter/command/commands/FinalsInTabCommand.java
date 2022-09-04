@@ -17,12 +17,15 @@ public class FinalsInTabCommand implements Command {
 
         externalFinalsCounter.saveConfig();
 
-        String output = externalFinalsCounter.getConfig().finalsInTab ? "Enabled" : "Disabled" + " finals counter in tab";
-
         try {
+            String output = (externalFinalsCounter.getConfig().finalsInTab ? "Enabled" : "Disabled") + " finals in tab";
+
             externalFinalsCounter.addChatComponentText(output);
-        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException | InstantiationException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException
+                 | InvocationTargetException
+                 | NoSuchMethodException
+                 | InstantiationException exception) {
+            exception.printStackTrace();
         }
     }
 }

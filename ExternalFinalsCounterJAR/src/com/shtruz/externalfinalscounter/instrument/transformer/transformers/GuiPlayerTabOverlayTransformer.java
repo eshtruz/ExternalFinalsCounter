@@ -14,6 +14,12 @@ import static com.shtruz.externalfinalscounter.mapping.Mappings.*;
 import static org.objectweb.asm.Opcodes.*;
 
 public class GuiPlayerTabOverlayTransformer implements Transformer {
+    private final Client client;
+
+    public GuiPlayerTabOverlayTransformer(Client client) {
+        this.client = client;
+    }
+
     @Override
     public byte[] transform(ClassLoader loader, String name, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] bytes) {
         if (classBeingRedefined == guiPlayerTabOverlayClass) {
@@ -33,7 +39,7 @@ public class GuiPlayerTabOverlayTransformer implements Transformer {
                             boolean nameCheck;
                             boolean descCheck;
 
-                            switch (ExternalFinalsCounter.instance.getClient()) {
+                            switch (client) {
                                 case LUNAR:
                                     opcodeCheck = methodInsnNode.getOpcode() == INVOKEVIRTUAL || methodInsnNode.getOpcode() == INVOKESPECIAL;
                                     nameCheck = methodInsnNode.name.equals(gptoGetPlayerNameMethod.getName())

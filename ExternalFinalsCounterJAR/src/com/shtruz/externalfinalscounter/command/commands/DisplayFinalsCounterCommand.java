@@ -17,12 +17,15 @@ public class DisplayFinalsCounterCommand implements Command {
 
         externalFinalsCounter.saveConfig();
 
-        String output = externalFinalsCounter.getConfig().displayFinalsCounter ? "Enabled" : "Disabled" + " finals counter HUD";
-
         try {
+            String output = (externalFinalsCounter.getConfig().displayFinalsCounter ? "Enabled" : "Disabled") + " finals counter HUD";
+
             externalFinalsCounter.addChatComponentText(output);
-        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException | InstantiationException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException
+                 | InvocationTargetException
+                 | NoSuchMethodException
+                 | InstantiationException exception) {
+            exception.printStackTrace();
         }
     }
 }

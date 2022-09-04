@@ -30,7 +30,6 @@ public class ExternalFinalsCounter {
     private final FinalsCounterRenderer finalsCounterRenderer = new FinalsCounterRenderer(this);
     private final CommandManager commandManager = new CommandManager(this);
     private final Instrumentation instrumentation = new Instrumentation();
-    private Client client;
     private File configFile;
     private Config config = new Config();
     private final Gson gson = new Gson();
@@ -40,8 +39,6 @@ public class ExternalFinalsCounter {
     }
 
     public boolean initialize(Client client, ClassLoader classLoader, String workingDirectory) {
-        this.client = client;
-
         configFile = new File(workingDirectory, "ExternalFinalsCounter.json");
 
         if (configFile.exists()) {
@@ -90,8 +87,8 @@ public class ExternalFinalsCounter {
 
         instrumentation.addTransformer(new GuiNewChatTransformer());
         instrumentation.addTransformer(new EntityPlayerSPTransformer());
-        instrumentation.addTransformer(new MinecraftTransformer());
-        instrumentation.addTransformer(new GuiPlayerTabOverlayTransformer());
+        instrumentation.addTransformer(new MinecraftTransformer(client));
+        instrumentation.addTransformer(new GuiPlayerTabOverlayTransformer(client));
 
         if (!instrumentation.retransformClass(guiNewChatClass)
                 || !instrumentation.retransformClass(entityPlayerSPClass)
@@ -136,10 +133,6 @@ public class ExternalFinalsCounter {
         return finalsCounterRenderer;
     }
 
-    public Client getClient() {
-        return client;
-    }
-
     public Config getConfig() {
         return config;
     }
@@ -166,10 +159,10 @@ public class ExternalFinalsCounter {
 
         Object thePlayer = thePlayerField.get(minecraft);
 
-        Object finalsChatComponentText = chatComponentTextClass
+        Object chatComponentText = chatComponentTextClass
                 .getDeclaredConstructor(String.class)
                 .newInstance(text);
 
-        addChatComponentMessageMethod.invoke(thePlayer, finalsChatComponentText);
+        addChatComponentMessageMethod.invoke(thePlayer, chatComponentText);
     }
 }

@@ -36,12 +36,12 @@ public class FinalsCommand implements Command {
                     .stream()
                     .reduce(0, Integer::sum);
 
-            String output = externalFinalsCounter.getChatMessageParser().getBluePrefix() + "BLUE: " + "\u00A7f" + blueFinals + "\n"
+            String finals = externalFinalsCounter.getChatMessageParser().getBluePrefix() + "BLUE: " + "\u00A7f" + blueFinals + "\n"
                     + externalFinalsCounter.getChatMessageParser().getGreenPrefix() + "GREEN: " + "\u00A7f" + greenFinals + "\n"
                     + externalFinalsCounter.getChatMessageParser().getRedPrefix() + "RED: " + "\u00A7f" + redFinals + "\n"
                     + externalFinalsCounter.getChatMessageParser().getYellowPrefix() + "YELLOW: " + "\u00A7f" + yellowFinals;
 
-            externalFinalsCounter.addChatComponentText(output);
+            externalFinalsCounter.addChatComponentText(finals);
         } catch (IllegalAccessException
                  | InvocationTargetException
                  | NoSuchMethodException

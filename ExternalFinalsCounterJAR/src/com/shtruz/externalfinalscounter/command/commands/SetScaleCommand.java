@@ -34,12 +34,15 @@ public class SetScaleCommand implements Command {
 
         externalFinalsCounter.saveConfig();
 
-        String output = "Finals HUD scale has been set to " + scale + " (the default scale is 100)";
-
         try {
+            String output = "Set scale to " + scale + "%";
+
             externalFinalsCounter.addChatComponentText(output);
-        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException | InstantiationException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException
+                 | InvocationTargetException
+                 | NoSuchMethodException
+                 | InstantiationException exception) {
+            exception.printStackTrace();
         }
     }
 }
