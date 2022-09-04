@@ -235,6 +235,13 @@ public class ChatMessageParser {
                 return;
             }
 
+            String unformattedText = (String) getUnformattedTextMethod.invoke(iChatComponent);
+
+            if (unformattedText.equals("                                 Mega Walls")) {
+                reset();
+                return;
+            }
+
             Object theWorld = theWorldField.get(minecraft);
 
             if (theWorld == null) {
@@ -256,13 +263,6 @@ public class ChatMessageParser {
             String scoreboardTitle = (String) getDisplayNameMethod.invoke(objective);
             scoreboardTitle = (String) stripControlCodesMethod.invoke(null, scoreboardTitle);
             if (!scoreboardTitle.contains("MEGA WALLS")) {
-                return;
-            }
-
-            String unformattedText = (String) getUnformattedTextMethod.invoke(iChatComponent);
-
-            if (unformattedText.equals("                                 Mega Walls")) {
-                reset();
                 return;
             }
 
