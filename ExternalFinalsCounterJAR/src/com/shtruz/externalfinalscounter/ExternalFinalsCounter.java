@@ -18,6 +18,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -158,5 +159,17 @@ public class ExternalFinalsCounter {
         } catch (IOException exception) {
             exception.printStackTrace();
         }
+    }
+
+    public void addChatComponentText(String text) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+        Object minecraft = getMinecraftMethod.invoke(null);
+
+        Object thePlayer = thePlayerField.get(minecraft);
+
+        Object finalsChatComponentText = chatComponentTextClass
+                .getDeclaredConstructor(String.class)
+                .newInstance(text);
+
+        addChatComponentMessageMethod.invoke(thePlayer, finalsChatComponentText);
     }
 }

@@ -3,6 +3,8 @@ package com.shtruz.externalfinalscounter.command.commands;
 import com.shtruz.externalfinalscounter.ExternalFinalsCounter;
 import com.shtruz.externalfinalscounter.command.Command;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class SetPosCommand implements Command {
     @Override
     public String getName() {
@@ -34,5 +36,13 @@ public class SetPosCommand implements Command {
         externalFinalsCounter.getConfig().finalsCounterY = y;
 
         externalFinalsCounter.saveConfig();
+
+        String output = "Finals HUD position has been set to X: " + x + ", Y: " + y;
+
+        try {
+            externalFinalsCounter.addChatComponentText(output);
+        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException | InstantiationException e) {
+            e.printStackTrace();
+        }
     }
 }

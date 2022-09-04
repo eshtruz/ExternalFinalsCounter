@@ -3,6 +3,8 @@ package com.shtruz.externalfinalscounter.command.commands;
 import com.shtruz.externalfinalscounter.ExternalFinalsCounter;
 import com.shtruz.externalfinalscounter.command.Command;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class DisplayFinalsCounterCommand implements Command {
     @Override
     public String getName() {
@@ -14,5 +16,13 @@ public class DisplayFinalsCounterCommand implements Command {
         externalFinalsCounter.getConfig().displayFinalsCounter = !externalFinalsCounter.getConfig().displayFinalsCounter;
 
         externalFinalsCounter.saveConfig();
+
+        String output = externalFinalsCounter.getConfig().displayFinalsCounter ? "Enabled" : "Disabled" + " finals counter HUD";
+
+        try {
+            externalFinalsCounter.addChatComponentText(output);
+        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException | InstantiationException e) {
+            e.printStackTrace();
+        }
     }
 }
