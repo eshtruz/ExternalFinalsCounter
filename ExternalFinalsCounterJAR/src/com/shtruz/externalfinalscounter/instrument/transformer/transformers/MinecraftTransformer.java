@@ -1,6 +1,7 @@
 package com.shtruz.externalfinalscounter.instrument.transformer.transformers;
 
 import com.shtruz.externalfinalscounter.ExternalFinalsCounter;
+import com.shtruz.externalfinalscounter.Client;
 import com.shtruz.externalfinalscounter.instrument.transformer.CustomClassWriter;
 import com.shtruz.externalfinalscounter.instrument.transformer.Transformer;
 import org.objectweb.asm.ClassReader;
